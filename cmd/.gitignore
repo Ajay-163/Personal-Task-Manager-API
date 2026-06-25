@@ -1,0 +1,15 @@
+# Executables
+*.exe
+
+# Build output
+*.out
+
+# VS Code
+.vscode/
+
+# Environment files
+.env
+
+# OS files
+Thumbs.db
+.DS_Store
