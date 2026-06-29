@@ -2,22 +2,22 @@ package repository
 
 import (
 	"database/sql"
-	"personal-task-manager/internal/models"
 	"fmt"
+	"personal-task-manager/internal/models"
 )
 
-type TaskRepository struct {
+type MySQLTaskRepository struct {
 	db *sql.DB
 }
 
-func NewTaskRepository(db *sql.DB) *TaskRepository {
-	return &TaskRepository{
+func NewMySQLTaskRepository(db *sql.DB) *MySQLTaskRepository {
+	return &MySQLTaskRepository{
 		db: db,
 	}
 }
 
 // function to creating task
-func (r *TaskRepository) CreateTask(
+func (r *MySQLTaskRepository) CreateTask(
 	task models.Task,
 ) (models.Task, error) {
 
@@ -50,7 +50,7 @@ func (r *TaskRepository) CreateTask(
 }
 
 // function to get task by id
-func (r *TaskRepository) GetTaskByID(
+func (r *MySQLTaskRepository) GetTaskByID(
 	id int,
 ) (models.Task, bool) {
 
@@ -68,34 +68,32 @@ func (r *TaskRepository) GetTaskByID(
 	WHERE id = ?
 	`
 	err := r.db.QueryRow(
-	query,
-	id,
-).Scan(
-	&task.ID,
-	&task.Title,
-	&task.Description,
-	&task.Completed,
-	&task.CreatedAt,
-	&task.UpdatedAt,
-)
+		query,
+		id,
+	).Scan(
+		&task.ID,
+		&task.Title,
+		&task.Description,
+		&task.Completed,
+		&task.CreatedAt,
+		&task.UpdatedAt,
+	)
 
-fmt.Println("ID Received:", id)
+	fmt.Println("ID Received:", id)
 
-if err != nil {
-	fmt.Println("Query Error:", err)
-	return models.Task{}, false
+	if err != nil {
+		fmt.Println("Query Error:", err)
+		return models.Task{}, false
+	}
+
+	fmt.Println("Task Found:", task)
+
+	return task, true
+
 }
 
-fmt.Println("Task Found:", task)
-
-return task, true
-
-	
-
-	
-}
 // function to get list of tasks
-func (r *TaskRepository) GetAllTasks() []models.Task {
+func (r *MySQLTaskRepository) GetAllTasks() []models.Task {
 
 	query := `
 	SELECT
@@ -138,7 +136,7 @@ func (r *TaskRepository) GetAllTasks() []models.Task {
 }
 
 // function to update tasks
-func (r *TaskRepository) UpdateTask(
+func (r *MySQLTaskRepository) UpdateTask(
 	id int,
 	task models.Task,
 ) (models.Task, bool) {
@@ -175,7 +173,7 @@ func (r *TaskRepository) UpdateTask(
 }
 
 // function to delete tasks
-func (r *TaskRepository) DeleteTask(id int) bool {
+func (r *MySQLTaskRepository) DeleteTask(id int) bool {
 
 	query := `
 	DELETE FROM tasks

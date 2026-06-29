@@ -18,7 +18,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	repo := repository.NewTaskRepository(db)
+	repo := repository.NewMySQLTaskRepository(db)
 
 	taskService := service.NewTaskService(repo)
 
