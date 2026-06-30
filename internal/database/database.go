@@ -7,6 +7,7 @@ import (
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/joho/godotenv"
+	_ "github.com/lib/pq"
 )
 
 func Connect() (*sql.DB, error) {
@@ -23,15 +24,45 @@ func Connect() (*sql.DB, error) {
 	user := os.Getenv("DB_USER")
 	password := os.Getenv("DB_PASSWORD")
 	database := os.Getenv("DB_NAME")
-	dsn := fmt.Sprintf(
-		"%s:%s@tcp(%s:%s)/%s?parseTime=true",
-		user,
-		password,
-		host,
-		port,
-		database,
+
+	var (
+		dsn string
+		db  *sql.DB
 	)
-	db, err := sql.Open(driver, dsn)
+	switch driver {
+
+	case "mysql":
+
+		dsn = fmt.Sprintf(
+			"%s:%s@tcp(%s:%s)/%s?parseTime=true",
+			user,
+			password,
+			host,
+			port,
+			database,
+		)
+
+		db, err = sql.Open("mysql", dsn)
+
+	case "postgres":
+
+		dsn = fmt.Sprintf(
+			"host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
+			host,
+			port,
+			user,
+			password,
+			database,
+		)
+
+		db, err = sql.Open("postgres", dsn)
+
+	default:
+		return nil, fmt.Errorf(
+			"unsupported database driver: %s",
+			driver,
+		)
+	}
 
 	if err != nil {
 		return nil, err

@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"net/http"
+	"os"
 
 	"personal-task-manager/internal/database"
 	"personal-task-manager/internal/handlers"
@@ -17,8 +18,25 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	driver := os.Getenv("DB_DRIVER")
 
-	repo := repository.NewMySQLTaskRepository(db)
+	var repo repository.TaskRepository
+
+	switch driver {
+
+	case "mysql":
+
+		repo = repository.NewMySQLTaskRepository(db)
+
+	case "postgres":
+
+		repo = repository.NewPostgresTaskRepository(db)
+
+	default:
+
+		log.Fatalf("unsupported database: %s", driver)
+
+	}
 
 	taskService := service.NewTaskService(repo)
 
